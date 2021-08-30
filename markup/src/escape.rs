@@ -1,4 +1,4 @@
-pub fn escape(str: &str, writer: &mut impl std::fmt::Write) -> std::fmt::Result {
+pub fn escape(str: &str, writer: &mut dyn std::fmt::Write) -> std::fmt::Result {
     let mut last = 0;
     for (index, byte) in str.bytes().enumerate() {
         macro_rules! go {

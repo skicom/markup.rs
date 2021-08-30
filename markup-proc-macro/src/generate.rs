@@ -45,7 +45,7 @@ impl ToTokens for Struct {
                 }
             }
             impl #impl_generics ::markup::Render for #name #ty_generics #where_clause {
-                fn render(&self, __writer: &mut impl std::fmt::Write) -> std::fmt::Result {
+                fn render(&self, __writer: &mut dyn std::fmt::Write) -> std::fmt::Result {
                     let #name { #splat_fields } = self;
                     #built
                     Ok(())

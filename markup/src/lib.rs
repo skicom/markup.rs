@@ -3,7 +3,7 @@ pub use markup_proc_macro::{define, new};
 mod escape;
 
 pub trait Render {
-    fn render(&self, writer: &mut impl std::fmt::Write) -> std::fmt::Result;
+    fn render(&self, writer: &mut dyn std::fmt::Write) -> std::fmt::Result;
 
     #[doc(hidden)]
     #[inline]
@@ -26,7 +26,7 @@ pub trait Render {
 
 impl<'a, T: Render + ?Sized> Render for &'a T {
     #[inline]
-    fn render(&self, writer: &mut impl std::fmt::Write) -> std::fmt::Result {
+    fn render(&self, writer: &mut dyn std::fmt::Write) -> std::fmt::Result {
         (*self).render(writer)
     }
 
@@ -51,7 +51,7 @@ impl<'a, T: Render + ?Sized> Render for &'a T {
 
 impl Render for bool {
     #[inline]
-    fn render(&self, writer: &mut impl std::fmt::Write) -> std::fmt::Result {
+    fn render(&self, writer: &mut dyn std::fmt::Write) -> std::fmt::Result {
         write!(writer, "{}", self)
     }
 
@@ -70,7 +70,7 @@ impl Render for bool {
 
 impl<T: Render> Render for Option<T> {
     #[inline]
-    fn render(&self, writer: &mut impl std::fmt::Write) -> std::fmt::Result {
+    fn render(&self, writer: &mut dyn std::fmt::Write) -> std::fmt::Result {
         match self {
             Some(t) => t.render(writer),
             None => Ok(()),
@@ -88,7 +88,7 @@ pub struct Raw<T: AsRef<str>>(T);
 
 impl<T: AsRef<str>> Render for Raw<T> {
     #[inline]
-    fn render(&self, writer: &mut impl std::fmt::Write) -> std::fmt::Result {
+    fn render(&self, writer: &mut dyn std::fmt::Write) -> std::fmt::Result {
         writer.write_str(self.0.as_ref())
     }
 }
@@ -109,7 +109,7 @@ tfor! {
     for Ty in [char, f32, f64] {
         impl Render for Ty {
             #[inline]
-            fn render(&self, writer: &mut impl std::fmt::Write) -> std::fmt::Result {
+            fn render(&self, writer: &mut dyn std::fmt::Write) -> std::fmt::Result {
                 write!(writer, "{}", self)
             }
         }
@@ -120,7 +120,7 @@ tfor! {
     for Ty in [u8, u16, u32, u64, u128, usize, i8, i16, i32, i64, i128, isize] {
         impl Render for Ty {
             #[inline]
-            fn render(&self, writer: &mut impl std::fmt::Write) -> std::fmt::Result {
+            fn render(&self, writer: &mut dyn std::fmt::Write) -> std::fmt::Result {
                 itoa::fmt(writer, *self)
             }
         }
@@ -129,14 +129,14 @@ tfor! {
 
 impl Render for str {
     #[inline]
-    fn render(&self, writer: &mut impl std::fmt::Write) -> std::fmt::Result {
+    fn render(&self, writer: &mut dyn std::fmt::Write) -> std::fmt::Result {
         escape::escape(self, writer)
     }
 }
 
 impl Render for String {
     #[inline]
-    fn render(&self, writer: &mut impl std::fmt::Write) -> std::fmt::Result {
+    fn render(&self, writer: &mut dyn std::fmt::Write) -> std::fmt::Result {
         self.as_str().render(writer)
     }
 }
@@ -157,7 +157,7 @@ where
     F: Fn(&mut dyn std::fmt::Write) -> std::fmt::Result,
 {
     #[inline]
-    fn render(&self, writer: &mut impl std::fmt::Write) -> std::fmt::Result {
+    fn render(&self, writer: &mut dyn std::fmt::Write) -> std::fmt::Result {
         (self.f)(writer)
     }
 }
